@@ -1,0 +1,39 @@
+DROP TABLE IF EXISTS bookings CASCADE;
+DROP TABLE IF EXISTS wallet_audit_logs CASCADE;
+DROP TABLE IF EXISTS properties CASCADE;
+DROP TABLE IF EXISTS guests CASCADE;
+
+CREATE TABLE IF NOT EXISTS guests (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    wallet_balance DECIMAL(10, 2) NOT NULL CHECK (wallet_balance >= 0.00)
+);
+
+CREATE TABLE IF NOT EXISTS wallet_audit_logs (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    guest_id INT NOT NULL,
+    amount_changed DECIMAL(10, 2) NOT NULL,
+    action_type VARCHAR(50) NOT NULL,
+    balance_after DECIMAL(10, 2) NOT NULL,
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_guest FOREIGN KEY (guest_id) REFERENCES guests(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS properties (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    base_price DECIMAL(10, 2) NOT NULL CHECK (base_price >= 0.00),
+    latitude DECIMAL(9, 6) NOT NULL,
+    longitude DECIMAL(9, 6) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS bookings (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    guest_id INT NOT NULL,
+    property_id INT NOT NULL,
+    total_cost DECIMAL(10, 2) NOT NULL CHECK (total_cost >= 0.00),
+    status VARCHAR(20) NOT NULL CHECK (status IN ('CONFIRMED', 'CHECKED_IN', 'COMPLETED')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_booking_guest FOREIGN KEY (guest_id) REFERENCES guests(id) ON DELETE CASCADE,
+    CONSTRAINT fk_booking_property FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE
+);
