@@ -20,5 +20,11 @@
             "expiresOn": 0,
             "sshPassword": ""
         }
+    ],
+    "mdb.presetConnections": [
+        {
+            "name": "Dev MongoDB",
+            "connectionString": "mongodb://mongo:27017/app"
+        }
     ]
 }
