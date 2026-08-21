@@ -9,7 +9,7 @@ Assignment 1- Database Design
 **Project:** 3 StaySpot– Vacation Rental & Experiences
 
 **Team Members:**
-- Anirudh Bandi []
+- Anirudh Bandi [2026201058]
 - Dhruv Bhuva []
 - Lakshyajeet Singh Jalal [2026201063]
 - Thejas Gowda []
