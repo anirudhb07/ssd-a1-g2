@@ -2,12 +2,37 @@
 
 ## Assignment 1- Database Design
 
-**Team:** 2
+### Team and Project Details
+
+**Group:** 2
 
 **Project:** 3 StaySpot– Vacation Rental & Experiences
 
-Team Members:
+**Team Members:**
 - Anirudh Bandi []
 - Dhruv Bhuva []
 - Lakshyajeet Singh Jalal [2026201063]
 - Thejas Gowda []
+
+### Setup Instructions (Windows, MacOS, Linux)
+
+1. Install [VS Code](https://code.visualstudio.com/) & [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+2. Clone the repository and open it in VS Code
+
+    ```sh
+    git clone https://github.com/mglsj/ssd-a1-g2.git
+    ```
+
+    ```sh
+    cd ssd-a1-g2
+    ```
+
+    ```sh
+    code .
+    ```
+
+3. Install **Dev Containers** extension [`ms-vscode-remote.remote-containers`] in VS Code
+4. Open the project in a Dev Container
+    - `CTRL+SHIFT+P` / `CMD+SHIFT+P` and select
+    - `Dev Containers: Rebuild and Reopen in Container`
+5. Wait for the container to build and open the project in a new VS Code window (5-10 minutes on first build)
