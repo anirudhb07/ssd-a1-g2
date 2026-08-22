@@ -1,0 +1,13 @@
+{
+  "name": "ssd-a1",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Type-checking harness for the mongosh scripts in mongo/. Not a runtime dependency - mongosh executes the .js files directly.",
+  "scripts": {
+    "typecheck": "tsc -p jsconfig.json",
+    "typecheck:watch": "tsc -p jsconfig.json --watch"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

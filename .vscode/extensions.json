@@ -6,7 +6,8 @@
     "mongodb.mongodb-vscode",
     "ms-ossdata.vscode-pgsql",
     "bierner.github-markdown-preview",
-    "inferrinizzard.prettier-sql-vscode"
+    "inferrinizzard.prettier-sql-vscode",
+    "typescriptteam.native-preview"
   ],
   "unwantedRecommendations": []
 }
