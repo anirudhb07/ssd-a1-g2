@@ -1,4 +1,4 @@
-db = db.getSiblingDB('StaySpot')
+db = db.getSiblingDB('app')
 
 // PropertyAmenities
 
@@ -37,7 +37,7 @@ db.PropertyAmenities.createIndex(
 // Dummy data
 
 // db.PropertyAmenities.insertOne({
-//   property_id: UUID("12-34"),
+//   property_id: UUID("715be37f-0963-410d-bc52-f7213df3a514"),
 //   amenities: ["WiFi", "Pool", "Air Conditioning"],
 //   house_rules: ["No smoking", "Quiet hours after 10 PM"],
 //   accessibility_features: ["Step-free path", "Wide doorway"],

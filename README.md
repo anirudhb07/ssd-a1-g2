@@ -63,4 +63,17 @@ PSQL Command Line:
 psql postgresql://postgres:postgres@localhost:5432/app
 ```
 
+### Running Python Scripts
+
+```sh
+cd data_generation
+```
+
+```sh
+uv run postgres_seeder.py
+```
+
+```sh
+uv run mongo_seeder.py
+```
 
