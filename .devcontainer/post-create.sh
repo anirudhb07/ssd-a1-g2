@@ -2,13 +2,13 @@
 set -e
 
 # Install Python dependencies if a requirements file exists
-if [ -f "requirements.txt" ]; then
-  pip install --user -r requirements.txt
+if [ -f "data_generation/pyproject.toml" ]; then
+  (cd data_generation && uv sync)
 fi
 
 # Install Node dependencies if a package.json exists
-if [ -f "package.json" ]; then
-  npm install
+if [ -f "mongo/package.json" ]; then
+  (cd mongo && npm install)
 fi
 
 echo ""

@@ -20,6 +20,8 @@
  */
 interface CollectionSchemas {
   PropertyAmenities: CollectionDocumentOf<typeof PropertyAmenitiesSchema>;
+  SearchSessions: CollectionDocumentOf<typeof SearchSessionsSchema>;
+  PropertyReviews: CollectionDocumentOf<typeof PropertyReviewsSchema>;
 
   // SearchSessions and PropertyReviews are commented out in
   // mongo/01_collections_and_indexes.js. Uncomment them there, hoist each
@@ -49,5 +51,7 @@ interface CollectionSchemas {
  * are caught separately, at the `createCollection` call itself.
  */
 type SchemaKeywordChecks = [
-  ExpectNever<UnknownSchemaKeywords<typeof PropertyAmenitiesSchema>>
+  ExpectNever<UnknownSchemaKeywords<typeof PropertyAmenitiesSchema>>,
+  ExpectNever<UnknownSchemaKeywords<typeof SearchSessionsSchema>>,
+  ExpectNever<UnknownSchemaKeywords<typeof PropertyReviewsSchema>>
 ];
