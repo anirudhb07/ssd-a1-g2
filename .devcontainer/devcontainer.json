@@ -36,7 +36,8 @@
         "ms-python.vscode-pylance",
         "mongodb.mongodb-vscode",
         "ms-ossdata.vscode-pgsql",
-        "bierner.github-markdown-preview"
+        "bierner.github-markdown-preview",
+        "inferrinizzard.prettier-sql-vscode"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python"

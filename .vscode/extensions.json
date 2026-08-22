@@ -1,4 +1,12 @@
 {
-  "recommendations": ["ms-vscode-remote.remote-containers"],
+  "recommendations": [
+    "ms-vscode-remote.remote-containers",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "mongodb.mongodb-vscode",
+    "ms-ossdata.vscode-pgsql",
+    "bierner.github-markdown-preview",
+    "inferrinizzard.prettier-sql-vscode"
+  ],
   "unwantedRecommendations": []
 }

@@ -1,4 +1,6 @@
 {
+    "files.eol": "\n",
+    "files.autoSaveWhenNoErrors": true,
     "pgsql.connections": [
         {
             "id": "1A23EA89-C3E8-4177-9B07-A04A66A23E2E",
@@ -26,5 +28,11 @@
             "name": "Dev MongoDB",
             "connectionString": "mongodb://mongo:27017/app"
         }
-    ]
+    ],
+    "Prettier-SQL.SQLFlavourOverride": "postgresql",
+    "Prettier-SQL.indentStyle": "standard",
+    "Prettier-SQL.keywordCase": "upper",
+    "[sql]": {
+        "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
+    }
 }
