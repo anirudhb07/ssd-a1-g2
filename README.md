@@ -12,7 +12,7 @@ Assignment 1- Database Design
 - Anirudh Bandi [2026201058]
 - Dhruv Bhuva []
 - Lakshyajeet Singh Jalal [2026201063]
-- Thejas Gowda []
+- Thejas Gowda [2026201023]
 
 ## Setup Instructions (Windows, MacOS, Linux)
 
