@@ -11,14 +11,14 @@
   "forwardPorts": [
     3000,
     5000,
-    55432,
-    27018
+    5432,
+    27017
   ],
   "portsAttributes": {
-    "55432": {
+    "5432": {
       "label": "PostgreSQL"
     },
-    "27018": {
+    "27017": {
       "label": "MongoDB"
     }
   },
