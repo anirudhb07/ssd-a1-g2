@@ -2,11 +2,6 @@
   "compilerOptions": {
     "target": "ES2020",
     "lib": ["ES2020"],
-    // mongosh evaluates each file as a plain script in a shared global scope.
-    // Any .js file here without a top-level import/export is treated as a
-    // script by TypeScript, which is what makes the globals in
-    // types/mongosh.d.ts visible. Do not add imports to the mongo/ scripts -
-    // mongosh cannot run them.
     "module": "commonjs",
     "allowJs": true,
     "checkJs": true,
@@ -15,19 +10,9 @@
     "noUnusedLocals": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    // TypeScript 7 flipped the default for this to `true`. Leaving it there
-    // would skip every file in types/, which is where the mongosh API surface
-    // and the schema-to-document derivation live - errors in our own type
-    // definitions would go unreported, and the schema keyword assertion in
-    // types/collections.d.ts would never run. There is no cost to checking
-    // here: `"types": []` and the absence of imports mean no node_modules
-    // declaration files are in the program.
     "skipLibCheck": false,
-    // Keep @types/node and friends out of the global scope; the mongosh
-    // globals come from types/ only. mongosh is not Node - `require`,
-    // `process` and `Buffer` are not what these scripts should reach for.
     "types": []
   },
-  "include": ["mongo/**/*.js", "types/**/*.d.ts"],
+  "include": ["**/*.js", "types/**/*.d.ts", "../types/**/*.d.ts"],
   "exclude": ["node_modules"]
 }

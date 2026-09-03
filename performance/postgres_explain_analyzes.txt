@@ -1,0 +1,27 @@
+                                                                        QUERY PLAN                                                                         
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+ WindowAgg  (cost=20.01..20.09 rows=4 width=92) (actual time=0.104..0.106 rows=0.00 loops=1)
+   Window: w2 AS (PARTITION BY ((bookings.created_at)::date) ORDER BY (sum(bookings.total_cost)) ROWS UNBOUNDED PRECEDING)
+   Buffers: shared hit=9
+   ->  Sort  (cost=20.01..20.02 rows=4 width=84) (actual time=0.103..0.104 rows=0.00 loops=1)
+         Sort Key: ((bookings.created_at)::date), (sum(bookings.total_cost)) DESC
+         Sort Method: quicksort  Memory: 25kB
+         Buffers: shared hit=9
+         ->  WindowAgg  (cost=19.80..19.97 rows=4 width=84) (actual time=0.056..0.057 rows=0.00 loops=1)
+               Window: w1 AS (PARTITION BY bookings.property_id ORDER BY ((bookings.created_at)::date) ROWS BETWEEN '6'::bigint PRECEDING AND CURRENT ROW)
+               Buffers: shared hit=3
+               ->  GroupAggregate  (cost=19.80..19.90 rows=4 width=52) (actual time=0.055..0.056 rows=0.00 loops=1)
+                     Group Key: bookings.property_id, ((bookings.created_at)::date)
+                     Buffers: shared hit=3
+                     ->  Sort  (cost=19.80..19.81 rows=4 width=36) (actual time=0.054..0.055 rows=0.00 loops=1)
+                           Sort Key: bookings.property_id, ((bookings.created_at)::date)
+                           Sort Method: quicksort  Memory: 25kB
+                           Buffers: shared hit=3
+                           ->  Seq Scan on bookings  (cost=0.00..19.76 rows=4 width=36) (actual time=0.010..0.011 rows=0.00 loops=1)
+                                 Filter: (status = 'CONFIRMED'::booking_status)
+ Planning:
+   Buffers: shared hit=130 read=2
+ Planning Time: 1.810 ms
+ Execution Time: 0.282 ms
+(23 rows)
+
