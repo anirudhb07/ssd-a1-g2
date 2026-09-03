@@ -4,8 +4,6 @@
   ...
 }:
 {
-  devcontainer.enable = true;
-
   packages = [ pkgs.git ];
 
   env = {

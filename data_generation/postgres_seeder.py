@@ -1,6 +1,7 @@
 import os
 import random
 import uuid
+from datetime import timedelta
 from faker import Faker
 import psycopg2
 from psycopg2.extras import execute_values
@@ -32,7 +33,7 @@ def get_connection():
 def seed_postgres():
     conn = get_connection()
     cursor = conn.cursor()
-    print("🚀 Connected to PostgreSQL. Starting data seeding...")
+    print("Connected to PostgreSQL. Starting data seeding...")
 
     try:
         # 1. Seed Guests
@@ -71,6 +72,10 @@ def seed_postgres():
         )
         conn.commit()
 
+        # Nightly rate per property, so a booking's total_cost is consistent
+        # with how many nights it actually covers.
+        property_prices = {row[0]: row[2] for row in properties_data}
+
         # 3. Seed Bookings (50,000 required)
         print(f"Generating {NUM_BOOKINGS:,} bookings...")
         # Note: To avoid violating the active stay partial index (one CHECKED_IN stay per guest),
@@ -84,8 +89,20 @@ def seed_postgres():
         for _ in range(NUM_BOOKINGS):
             guest_id = random.choice(guest_ids)
             property_id = random.choice(property_ids)
-            total_cost = round(random.uniform(100.0, 3000.0), 2)
             created_at = fake.date_time_between(start_date='-1y', end_date='now')
+
+            # Stay window: booked 1-60 days ahead, for 1-14 nights.
+            # bookings_stay_window_check requires check_out > check_in, so
+            # nights is never 0.
+            nights = random.randint(1, 14)
+            check_in_date = created_at.date() + timedelta(days=random.randint(1, 60))
+            check_out_date = check_in_date + timedelta(days=nights)
+
+            # bookings_total_cost_check requires a strictly positive charge.
+            total_cost = max(
+                round(nights * property_prices[property_id] * random.uniform(0.85, 1.35), 2),
+                0.01
+            )
 
             # Handle status constraint for CHECKED_IN
             selected_status = random.choices(statuses, weights=status_weights)[0]
@@ -101,13 +118,16 @@ def seed_postgres():
                 property_id,
                 total_cost,
                 selected_status,
+                check_in_date,
+                check_out_date,
                 created_at
             ))
 
         execute_values(
             cursor,
             """
-            INSERT INTO bookings (id, guest_id, property_id, total_cost, status, created_at)
+            INSERT INTO bookings (id, guest_id, property_id, total_cost, status,
+                                  check_in_date, check_out_date, created_at)
             VALUES %s
             """,
             bookings_data,
@@ -150,11 +170,11 @@ def seed_postgres():
         cursor.execute("SELECT refresh_property_performance_mv();")
         conn.commit()
 
-        print("✅ Data seeding successfully completed!")
+        print("Data seeding successfully completed!")
 
     except Exception as e:
         conn.rollback()
-        print(f"❌ Error during seeding: {e}")
+        print(f"Error during seeding: {e}")
         raise e
     finally:
         cursor.close()
