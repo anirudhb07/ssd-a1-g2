@@ -49,5 +49,15 @@
     "Prettier-SQL.keywordCase": "upper",
     "[sql]": {
         "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
-    }
+    },
+    "pgsql.serverGroups": [
+        {
+            "name": "Servers",
+            "id": "5AF03625-CB25-4386-AFC8-47DD5818A7E9"
+        },
+        {
+            "name": "Servers 1",
+            "id": "5AF03625-CB25-4386-AFC8-47DD5818A7E9"
+        }
+    ]
 }
