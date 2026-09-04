@@ -103,7 +103,8 @@ psql "$DB" -v ON_ERROR_STOP=1 \
 10,000 guests, 2,000 properties, 50,000 bookings, 100,000 wallet audit rows.
 
 ```sh
-uv run --project data_generation data_generation/postgres_seeder.py
+uv run --project data_generation \
+    data_generation/postgres_seeder.py
 ```
 
 ### Step 3 - Create the MongoDB collections and indexes
@@ -115,7 +116,8 @@ mongosh "$MONGO_URI" mongo/01_collections_and_indexes.js
 ### Step 4 - Seed MongoDB
 
 ```sh
-uv run --project data_generation data_generation/mongo_seeder.py
+uv run --project data_generation \
+    data_generation/mongo_seeder.py
 ```
 
 ### Step 5 - Verify the engine logic (Workflow 1 and the constraints)
@@ -145,15 +147,19 @@ mongosh "$MONGO_URI" mongo/03_workflow4_facet.js
 ### Step 9 - Capture the performance evidence
 
 ```sh
-mkdir -p performance && { echo "EXPLAIN (ANALYZE, BUFFERS)"; cat sql/06_window_analytics.sql; } | psql "$DB" -f - > performance/postgres_explain_analyzes.txt
+{ echo "EXPLAIN (ANALYZE, BUFFERS)"; cat sql/06_window_analytics.sql; } \
+    | psql "$DB" -f - \
+    > performance/postgres_explain_analyzes.txt
 ```
 
 ```sh
-mongosh --quiet "$MONGO_URI" --eval "EXPLAIN=true" -f mongo/02_workflow3_geonear.js > performance/mongo_execution_stats_workflow3.json
+mongosh --quiet "$MONGO_URI" --eval "EXPLAIN=true" -f mongo/02_workflow3_geonear.js \
+    > performance/mongo_execution_stats_workflow3.json
 ```
 
 ```sh
-mongosh --quiet "$MONGO_URI" --eval "EXPLAIN=true" -f mongo/03_workflow4_facet.js > performance/mongo_execution_stats_workflow4.json
+mongosh --quiet "$MONGO_URI" --eval "EXPLAIN=true" -f mongo/03_workflow4_facet.js \
+    > performance/mongo_execution_stats_workflow4.json
 ```
 
 ---
