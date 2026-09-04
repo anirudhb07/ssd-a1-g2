@@ -1,13 +1,5 @@
 -- Verification script for the PostgreSQL engine logic.
---
--- Run with psql, from a session in autocommit (no surrounding BEGIN):
---     psql postgresql://postgres:postgres@localhost:5432/app -f sql/test_queries.sql
---
--- process_booking_payment performs its own transaction control, so every CALL
--- below sits at the top level. Wrapping one in a DO block or an explicit
--- transaction raises 2D000 -- that is a property of the procedure, not a bug
--- in it. The failing-case tests further down use explicit transactions
--- precisely because they do NOT call the procedure.
+
 \set ON_ERROR_STOP off
 \timing off
 

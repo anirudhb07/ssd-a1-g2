@@ -4,13 +4,11 @@
   ...
 }:
 {
-  packages = [ pkgs.git ];
-
-  env = {
-    PGUSER = "postgres";
-    PGPASSWORD = "postgres";
-    PGDATABASE = "app";
-  };
+  packages = [ 
+    pkgs.git 
+    pkgs.mongosh
+    pkgs.postgresql 
+  ];
 
   languages.python = {
     enable = true;
@@ -28,22 +26,4 @@
     lsp.enable = true;
     directory = "./mongo";
   };
-
-  services.postgres = {
-    enable = true;
-    initdbArgs = [
-      "--locale=C"
-      "--encoding=UTF8"
-      "--username=${config.env.PGUSER}"
-    ];
-    initialDatabases = [
-      {
-        name = config.env.PGDATABASE;
-        user = config.env.PGUSER;
-        pass = config.env.PGPASSWORD;
-      }
-    ];
-  };
-
-  services.mongodb.enable = true;
 }

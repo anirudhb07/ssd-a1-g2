@@ -1,40 +1,12 @@
-// ============================================================================
-// Project 3: StaySpot - Vacation Rental & Experiences
-// Script: 03_workflow4_facet.js
-// Workflow 4: Multi-Faceted Review Analytics
-//
-// One pass over PropertyReviews producing, in a single $facet:
-//   1. rating_distribution - counts and percentages for all 5 star levels
-//   2. top_tags            - most frequent location tags, via $unwind
-//   3. overall             - average rating across the window
-//
-// Run:      mongosh "$MONGO_URI" mongo/03_workflow4_facet.js
-// Explain:  mongosh "$MONGO_URI" --eval "EXPLAIN=true" -f mongo/03_workflow4_facet.js
-// ============================================================================
-
 db = db.getSiblingDB("app");
 
-/**
- * How far back the report looks.
- *
- * This bound is what lets the pipeline be index-served. A $facet's
- * sub-pipelines never use an index -- they consume whatever the preceding
- * stage streams to them -- so the ONLY stage that can hit an index here is the
- * $match in front, against idx_reviews_recent.
- *
- * The window has to be selective for that to be worth it. At 30 days over a
- * year of seeded reviews this scans roughly 8% of the collection and the
- * planner picks an IXSCAN. Widen it to cover the whole collection and the
- * planner will correctly switch back to a COLLSCAN -- reading most of an index
- * and then fetching most of the documents is slower than just reading the
- * documents. That is the planner being right, not the index failing.
- */
+// recent window size
 const REVIEW_WINDOW_DAYS = 30;
 
-/** How many tags the frequency facet returns. */
+// frequency facet tag return count
 const TOP_TAG_LIMIT = 10;
 
-/** The star levels every distribution must report, present in the data or not. */
+// ratings
 const STAR_LEVELS = [1, 2, 3, 4, 5];
 
 /**
@@ -45,46 +17,28 @@ function buildReviewAnalyticsPipeline(windowDays) {
   const windowStart = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
 
   return [
-    // ------------------------------------------------------------------
-    // Stage 1: the only index-servable stage. See REVIEW_WINDOW_DAYS.
-    // ------------------------------------------------------------------
+    // filter events in last windowDays 
     { $match: { created_at: { $gte: windowStart } } },
 
-    // ------------------------------------------------------------------
-    // Stage 2: three independent aggregations over the same input stream.
-    //
-    // This is what $facet buys: without it, the tag frequencies would need
-    // their own pass over the collection (an $unwind multiplies the
-    // document count, so it cannot share a pipeline with the rating
-    // aggregations), and the overall average a third. One $match feeds all
-    // three.
-    // ------------------------------------------------------------------
+    // multi aggregation (facet)
     {
       $facet: {
-        // --- 1. Rating distribution -----------------------------------
-        // Produces only the star levels actually present; the gaps are
-        // filled in after the $facet, where the total is known.
+        // 1. Rating distribution 
         rating_distribution: [
           { $group: { _id: "$rating", count: { $sum: 1 } } },
           { $sort: { _id: 1 } }
         ],
 
-        // --- 2. Most frequent tags ------------------------------------
-        // $unwind turns each review into one document per tag, so a review
-        // tagged ["beachfront", "quiet"] contributes to both counts.
-        // Reviews with no location_tags array drop out here, which is the
-        // intended behaviour: they have no tags to count.
+        // 2. Most frequent tags
         top_tags: [
           { $unwind: "$location_tags" },
           { $group: { _id: "$location_tags", count: { $sum: 1 } } },
-          // _id is the tie-breaker so the ordering is deterministic and the
-          // output is diffable between runs.
           { $sort: { count: -1, _id: 1 } },
           { $limit: TOP_TAG_LIMIT },
           { $project: { _id: 0, tag: "$_id", count: 1 } }
         ],
 
-        // --- 3. Overall rating ----------------------------------------
+        // 3. Overall rating
         overall: [
           {
             $group: {
@@ -108,14 +62,7 @@ function buildReviewAnalyticsPipeline(windowDays) {
       }
     },
 
-    // ------------------------------------------------------------------
-    // Stage 3: flatten `overall`.
-    //
-    // Every $facet output is an array, even a single-document one. The
-    // $ifNull matters: if the window contains no reviews at all, the
-    // sub-pipeline yields an empty array and $first returns missing, which
-    // would make every downstream percentage null rather than zero.
-    // ------------------------------------------------------------------
+    // Stage 3: flatten `overall`
     {
       $set: {
         overall: {
@@ -132,13 +79,7 @@ function buildReviewAnalyticsPipeline(windowDays) {
       }
     },
 
-    // ------------------------------------------------------------------
-    // Stage 4: densify the distribution to all 5 stars and add percentages.
-    //
-    // $group can only report levels that occur. A distribution missing its
-    // 1-star row reads as "no data" when it means "no 1-star reviews", so
-    // the levels are mapped over explicitly.
-    // ------------------------------------------------------------------
+    // densify the distribution to all 5 stars and add percentages
     {
       $set: {
         rating_distribution: {
@@ -199,9 +140,7 @@ function buildReviewAnalyticsPipeline(windowDays) {
       }
     },
 
-    // ------------------------------------------------------------------
-    // Stage 5: label the window so a captured result is self-describing.
-    // ------------------------------------------------------------------
+    // label the window
     {
       $set: {
         window: {
@@ -221,9 +160,7 @@ function buildReviewAnalyticsPipeline(windowDays) {
 function getReviewAnalytics(windowDays) {
   return db.PropertyReviews.aggregate(
     buildReviewAnalyticsPipeline(windowDays),
-    // The $unwind facet can outgrow the 100MB per-stage memory limit on a
-    // large collection; spilling is cheaper than failing.
-    { allowDiskUse: true }
+    { allowDiskUse: true } // use disk when memory overflow
   ).toArray();
 }
 
@@ -234,7 +171,7 @@ function getReviewAnalytics(windowDays) {
 function explainReviewAnalytics(windowDays) {
   return db.PropertyReviews.explain("executionStats").aggregate(
     buildReviewAnalyticsPipeline(windowDays),
-    { allowDiskUse: true }
+    { allowDiskUse: true } // use disk when memory overflow
   );
 }
 
@@ -244,13 +181,10 @@ function explainReviewAnalytics(windowDays) {
 
 if (db.PropertyReviews.estimatedDocumentCount() === 0) {
   throw new Error(
-    "PropertyReviews is empty. Run mongo/01_collections_and_indexes.js then " +
-      "data_generation/mongo_seeder.py."
+    "PropertyReviews is empty."
   );
 }
 
-// See the note in 02_workflow3_geonear.js: `typeof` is required because on the
-// normal invocation this identifier was never declared.
 const reviewExplainRequested = typeof EXPLAIN !== "undefined" && EXPLAIN === true;
 
 if (reviewExplainRequested) {
@@ -258,8 +192,8 @@ if (reviewExplainRequested) {
 } else {
   print(
     "Workflow 4: review analytics over the last " +
-      REVIEW_WINDOW_DAYS +
-      " days"
+    REVIEW_WINDOW_DAYS +
+    " days"
   );
   printjson(getReviewAnalytics(REVIEW_WINDOW_DAYS));
 }
