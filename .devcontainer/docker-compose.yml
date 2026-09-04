@@ -1,20 +1,17 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/cachix/devenv/devcontainer:latest
     volumes:
       - ..:/workspace:cached
-    command: sleep infinity
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: app
-      MONGO_HOST: mongo
-      MONGO_PORT: 27017
       MONGO_URI: mongodb://mongo:27017/app
+      MONGO_DB: app
+      DB: postgresql://postgres:postgres@postgres:5432/app
     depends_on:
       - mongo
       - postgres
