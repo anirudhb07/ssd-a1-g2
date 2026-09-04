@@ -8,8 +8,8 @@
 //   2. top_tags            - most frequent location tags, via $unwind
 //   3. overall             - average rating across the window
 //
-// Run:      mongosh mongo/03_workflow4_facet.js
-// Explain:  mongosh --eval "EXPLAIN=true" -f mongo/03_workflow4_facet.js
+// Run:      mongosh "$MONGO_URI" mongo/03_workflow4_facet.js
+// Explain:  mongosh "$MONGO_URI" --eval "EXPLAIN=true" -f mongo/03_workflow4_facet.js
 // ============================================================================
 
 db = db.getSiblingDB("app");

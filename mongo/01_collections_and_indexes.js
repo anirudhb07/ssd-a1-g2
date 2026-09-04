@@ -3,7 +3,7 @@
 // Script: 01_collections_and_indexes.js
 // Step 1/2: collection creation, document validation, 2dsphere + TTL indexes.
 //
-// Run:  mongosh mongo/01_collections_and_indexes.js
+// Run:  mongosh "$MONGO_URI" mongo/01_collections_and_indexes.js
 //
 // The database name matches the PostgreSQL side ("app"), which is what both
 // the dev container and devenv provision. Every script in mongo/ and

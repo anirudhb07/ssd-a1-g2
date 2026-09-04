@@ -7,11 +7,11 @@
 // bucketed into 1 km concentric rings, using $geoNear against the 2dsphere
 // index idx_sessions_geo_recent.
 //
-// Run:      mongosh mongo/02_workflow3_geonear.js
-// Explain:  mongosh --eval "EXPLAIN=true" -f mongo/02_workflow3_geonear.js
+// Run:      mongosh "$MONGO_URI" mongo/02_workflow3_geonear.js
+// Explain:  mongosh "$MONGO_URI" --eval "EXPLAIN=true" -f mongo/02_workflow3_geonear.js
 //
 // To capture the executionStats the README needs:
-//   mongosh --quiet --eval "EXPLAIN=true" -f mongo/02_workflow3_geonear.js \
+//   mongosh --quiet "$MONGO_URI" --eval "EXPLAIN=true" -f mongo/02_workflow3_geonear.js \
 //     > performance/mongo_execution_stats.json
 // ============================================================================
 
