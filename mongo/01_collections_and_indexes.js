@@ -1,18 +1,34 @@
-db = db.getSiblingDB('StaySpot');
+db = db.getSiblingDB("app");
 
-// 1. PropertyAmenities
-var PropertyAmenitiesSchema = /** @type {const} */ ({
+// ---------------------------------------------------------------------------
+// PropertyAmenities
+// ---------------------------------------------------------------------------
+
+const PropertyAmenitiesSchema = /** @type {const} */ ({
   bsonType: "object",
   title: "PropertyAmenities validation",
   required: ["property_id", "updated_at"],
+  additionalProperties: true,
   properties: {
     property_id: { bsonType: "binData" },
-    amenities: { bsonType: "array", items: { bsonType: "string" } },
+    amenity_categories: {
+      bsonType: "array",
+      items: {
+        bsonType: "object",
+        required: ["category", "items"],
+        properties: {
+          category: { bsonType: "string" },
+          items: { bsonType: "array", items: { bsonType: "string" } }
+        }
+      }
+    },
     house_rules: { bsonType: "array", items: { bsonType: "string" } },
     accessibility_features: { bsonType: "array", items: { bsonType: "string" } },
     updated_at: { bsonType: "date" }
   }
 });
+
+db.PropertyAmenities.drop();
 
 db.createCollection("PropertyAmenities", {
   validator: {
@@ -30,8 +46,11 @@ db.PropertyAmenities.createIndex(
   { name: "idx_amenities_property", unique: true }
 );
 
-// 2. SearchSessions
-var SearchSessionsSchema = /** @type {const} */ ({
+// ---------------------------------------------------------------------------
+// SearchSessions
+// ---------------------------------------------------------------------------
+
+const SearchSessionsSchema = /** @type {const} */ ({
   bsonType: "object",
   title: "SearchSessions validation",
   required: ["guest_id", "session_id", "location", "created_at"],
@@ -51,9 +70,20 @@ var SearchSessionsSchema = /** @type {const} */ ({
         }
       }
     },
+    search_filters: {
+      bsonType: "object",
+      properties: {
+        guests_count: { bsonType: "int", minimum: 1, maximum: 16 },
+        max_price: { bsonType: "number", minimum: 0 },
+        min_bedrooms: { bsonType: "int", minimum: 0 },
+        requires_pool: { bsonType: "bool" }
+      }
+    },
     created_at: { bsonType: "date" }
   }
 });
+
+db.SearchSessions.drop();
 
 db.createCollection("SearchSessions", {
   validator: {
@@ -67,18 +97,28 @@ db.createCollection("SearchSessions", {
   validationAction: "error"
 });
 
+// geo sphere index
+
 db.SearchSessions.createIndex(
   { location: "2dsphere", created_at: -1 },
   { name: "idx_sessions_geo_recent" }
 );
 
+// ttl index
+
 db.SearchSessions.createIndex(
   { created_at: 1 },
-  { name: "ttl_sessions_created_at", expireAfterSeconds: 7200 }
+  {
+    name: "ttl_sessions_created_at",
+    expireAfterSeconds: 7200 // 2h * 60m * 60s
+  }
 );
 
-// 3. PropertyReviews
-var PropertyReviewsSchema = /** @type {const} */ ({
+// ---------------------------------------------------------------------------
+// PropertyReviews
+// ---------------------------------------------------------------------------
+
+const PropertyReviewsSchema = /** @type {const} */ ({
   bsonType: "object",
   title: "PropertyReviews validation",
   required: ["property_id", "guest_id", "rating", "created_at"],
@@ -92,6 +132,8 @@ var PropertyReviewsSchema = /** @type {const} */ ({
   }
 });
 
+db.PropertyReviews.drop();
+
 db.createCollection("PropertyReviews", {
   validator: {
     $and: [
@@ -104,7 +146,22 @@ db.createCollection("PropertyReviews", {
   validationAction: "error"
 });
 
+// Per-property review history
 db.PropertyReviews.createIndex(
   { property_id: 1, created_at: -1 },
   { name: "idx_reviews_property_recent" }
 );
+
+// review history
+db.PropertyReviews.createIndex(
+  { created_at: -1 },
+  { name: "idx_reviews_recent" }
+);
+
+// Rating scoped history
+db.PropertyReviews.createIndex(
+  { rating: 1, created_at: -1 },
+  { name: "idx_reviews_rating_recent" }
+);
+
+print("Collections and indexes created on database: " + db.getName());

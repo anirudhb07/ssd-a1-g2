@@ -3,25 +3,21 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspace",
-  "features": {
-    "ghcr.io/devcontainers/features/node:2.1.0": {
-      "version": "latest"
-    }
-  },
   "forwardPorts": [
     3000,
     5000,
-    55432,
-    27018
+    5432,
+    27017
   ],
   "portsAttributes": {
-    "55432": {
+    "5432": {
       "label": "PostgreSQL"
     },
-    "27018": {
+    "27017": {
       "label": "MongoDB"
     }
   },
+  "overrideCommand": false,
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
