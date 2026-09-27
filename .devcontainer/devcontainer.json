@@ -6,11 +6,11 @@
   "forwardPorts": [
     3000,
     5000,
-    5432,
+    55432,
     27017
   ],
   "portsAttributes": {
-    "5432": {
+    "55432": {
       "label": "PostgreSQL"
     },
     "27017": {
