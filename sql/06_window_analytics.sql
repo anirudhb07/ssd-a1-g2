@@ -1,10 +1,10 @@
---
+-- ---------------------------
 -- Step 3
 -- Workflow 2: SQL window analytics.
---
+-- ---------------------------
 WITH
     daily_property_revenue AS (
-        -- Sparse: one row per (property, day) that actually had a booking.
+        -- Sparse: one row per (property, day) that actually had a booking
         SELECT
             b.property_id,
             (b.created_at AT TIME ZONE 'UTC')::date AS booking_date,
@@ -64,8 +64,9 @@ WITH
                 PARTITION BY
                     property_id
                 ORDER BY
-                    booking_date RANGE BETWEEN INTERVAL '6 days' PRECEDING
-                    AND CURRENT ROW
+                    booking_date
+                RANGE BETWEEN INTERVAL '6 days' PRECEDING
+                            AND CURRENT ROW
             )
     )
 SELECT

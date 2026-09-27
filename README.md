@@ -16,7 +16,7 @@ Assignment 1 - Database Design
 
 **Repository:** https://github.com/mglsj/ssd-a1-g2
 
-**Final commit hash:** ``
+**Final commit hash:** `a373b744439667444173f86fc1e8855b8669792c`
 
 ---
 

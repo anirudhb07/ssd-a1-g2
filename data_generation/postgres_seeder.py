@@ -8,6 +8,8 @@ from faker import Faker
 from psycopg2.extensions import connection as PgConnection
 from psycopg2.extras import execute_values
 
+from data import HYDERABAD_HOTELS, PROPERTY_COORD_JITTER, ROOM_VARIANTS
+
 # --- Types -----------------------------------------------------------------
 GuestRow = tuple[str, str, float]
 PropertyRow = tuple[str, str, float, float, float]
@@ -29,14 +31,12 @@ NUM_AUDIT_LOGS = 100_000
 
 fake = Faker()
 
+
 def get_connection() -> PgConnection:
     return psycopg2.connect(
-        host=DB_HOST,
-        port=DB_PORT,
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD
+        host=DB_HOST, port=DB_PORT, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD
     )
+
 
 def seed_postgres() -> None:
     conn = get_connection()
@@ -55,28 +55,35 @@ def seed_postgres() -> None:
             cursor,
             "INSERT INTO guests (id, name, wallet_balance) VALUES %s",
             guests_data,
-            page_size=5000
+            page_size=5000,
         )
         conn.commit()
 
         # 2. Seed Properties
-        print(f"Generating {NUM_PROPERTIES:,} properties...")
+        print(
+            f"Generating {NUM_PROPERTIES:,} properties across "
+            f"{len(HYDERABAD_HOTELS):,} real Hyderabad hotels..."
+        )
         property_ids: list[str] = [str(uuid.uuid4()) for _ in range(NUM_PROPERTIES)]
-        properties_data: list[PropertyRow] = [
-            (
-                pid,
-                f"{fake.city()} {random.choice(['Villa', 'Apartment', 'Cabin', 'Studio'])}",
-                round(random.uniform(50.0, 800.0), 2),
-                float(fake.latitude()),
-                float(fake.longitude())
+        properties_data: list[PropertyRow] = []
+        for pid in property_ids:
+            hotel_name, hotel_price, hotel_lat, hotel_lon = random.choice(
+                HYDERABAD_HOTELS
             )
-            for pid in property_ids
-        ]
+            title = f"{hotel_name} - {random.choice(ROOM_VARIANTS)}"
+            price = round(hotel_price * random.uniform(0.7, 1.3), 2)
+            latitude = hotel_lat + random.uniform(
+                -PROPERTY_COORD_JITTER, PROPERTY_COORD_JITTER
+            )
+            longitude = hotel_lon + random.uniform(
+                -PROPERTY_COORD_JITTER, PROPERTY_COORD_JITTER
+            )
+            properties_data.append((pid, title, price, latitude, longitude))
         execute_values(
             cursor,
             "INSERT INTO properties (id, title, base_price, latitude, longitude) VALUES %s",
             properties_data,
-            page_size=5000
+            page_size=5000,
         )
         conn.commit()
 
@@ -87,40 +94,45 @@ def seed_postgres() -> None:
         checked_in_guests: set[str] = set()
         bookings_data: list[BookingRow] = []
 
-        statuses: list[str] = ['CONFIRMED', 'CHECKED_IN', 'COMPLETED']
+        statuses: list[str] = ["CONFIRMED", "CHECKED_IN", "COMPLETED"]
         status_weights: list[float] = [0.4, 0.1, 0.5]  #
 
         for _ in range(NUM_BOOKINGS):
             guest_id = random.choice(guest_ids)
             property_id = random.choice(property_ids)
-            created_at = fake.date_time_between(start_date='-1y', end_date='now')
+            created_at = fake.date_time_between(start_date="-1y", end_date="now")
 
             nights = random.randint(1, 14)
             check_in_date = created_at.date() + timedelta(days=random.randint(1, 60))
             check_out_date = check_in_date + timedelta(days=nights)
 
             total_cost = max(
-                round(nights * property_prices[property_id] * random.uniform(0.85, 1.35), 2),
-                0.01
+                round(
+                    nights * property_prices[property_id] * random.uniform(0.85, 1.35),
+                    2,
+                ),
+                0.01,
             )
 
             selected_status = random.choices(statuses, weights=status_weights)[0]
-            if selected_status == 'CHECKED_IN':
+            if selected_status == "CHECKED_IN":
                 if guest_id in checked_in_guests:
-                    selected_status = 'COMPLETED'
+                    selected_status = "COMPLETED"
                 else:
                     checked_in_guests.add(guest_id)
 
-            bookings_data.append((
-                str(uuid.uuid4()),
-                guest_id,
-                property_id,
-                total_cost,
-                selected_status,
-                check_in_date,
-                check_out_date,
-                created_at
-            ))
+            bookings_data.append(
+                (
+                    str(uuid.uuid4()),
+                    guest_id,
+                    property_id,
+                    total_cost,
+                    selected_status,
+                    check_in_date,
+                    check_out_date,
+                    created_at,
+                )
+            )
 
         execute_values(
             cursor,
@@ -130,7 +142,7 @@ def seed_postgres() -> None:
             VALUES %s
             """,
             bookings_data,
-            page_size=10000
+            page_size=10000,
         )
         conn.commit()
 
@@ -140,18 +152,20 @@ def seed_postgres() -> None:
         for _ in range(NUM_AUDIT_LOGS):
             guest_id = random.choice(guest_ids)
             amount_changed = round(random.uniform(5.0, 500.0), 2)
-            action_type = random.choice(['DEBIT', 'CREDIT'])
+            action_type = random.choice(["DEBIT", "CREDIT"])
             balance_after = round(random.uniform(0.0, 10000.0), 2)
-            timestamp = fake.date_time_between(start_date='-1y', end_date='now')
+            timestamp = fake.date_time_between(start_date="-1y", end_date="now")
 
-            audit_data.append((
-                str(uuid.uuid4()),
-                guest_id,
-                amount_changed,
-                action_type,
-                balance_after,
-                timestamp
-            ))
+            audit_data.append(
+                (
+                    str(uuid.uuid4()),
+                    guest_id,
+                    amount_changed,
+                    action_type,
+                    balance_after,
+                    timestamp,
+                )
+            )
 
         execute_values(
             cursor,
@@ -160,7 +174,7 @@ def seed_postgres() -> None:
             VALUES %s
             """,
             audit_data,
-            page_size=10000
+            page_size=10000,
         )
         conn.commit()
 
@@ -178,6 +192,7 @@ def seed_postgres() -> None:
     finally:
         cursor.close()
         conn.close()
+
 
 if __name__ == "__main__":
     seed_postgres()

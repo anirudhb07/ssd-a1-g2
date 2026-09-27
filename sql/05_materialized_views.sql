@@ -1,6 +1,6 @@
---
+-- ---------------------------
 -- Step 2: Materialized views
---
+-- ---------------------------
 DROP MATERIALIZED VIEW IF EXISTS mv_property_performance CASCADE;
 
 -- Materialized View
@@ -37,7 +37,7 @@ GROUP BY
     p.id,
     p.title;
 
--- UNIQUE index 
+-- UNIQUE index
 CREATE UNIQUE INDEX idx_mv_property_performance_id ON mv_property_performance (property_id);
 
 -- Secondary index for "rank properties by revenue"

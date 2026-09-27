@@ -1,12 +1,14 @@
---
+-- ---------------------------
 -- Step 2. Triggers
---
--- Audit logging
---
+-- ---------------------------
+
 DROP TRIGGER IF EXISTS trg_guest_wallet_audit ON guests;
 
 DROP FUNCTION IF EXISTS log_wallet_balance_change ();
 
+--
+-- Audit logging
+--
 CREATE
 OR REPLACE FUNCTION log_wallet_balance_change () RETURNS TRIGGER AS $$
 DECLARE
@@ -14,7 +16,7 @@ DECLARE
     v_action WALLET_ACTION;
 BEGIN
     -- delta != 0 guaranteed by trigger
-    v_delta := NEW.wallet_balance - OLD.wallet_balance; 
+    v_delta := NEW.wallet_balance - OLD.wallet_balance;
 
     IF v_delta > 0 THEN
         v_action := 'CREDIT';
@@ -46,7 +48,7 @@ UPDATE OF wallet_balance ON guests FOR EACH ROW WHEN (
     OLD.wallet_balance IS DISTINCT
     FROM
         NEW.wallet_balance
-        -- trigger only when wallet balance changes 
+        -- trigger only when wallet balance changes
 )
 EXECUTE FUNCTION log_wallet_balance_change ();
 

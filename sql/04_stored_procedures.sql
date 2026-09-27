@@ -1,8 +1,7 @@
---
+-- ---------------------------
 -- Step 3
 -- Workflow 1: Atomic Booking (stored procedure)
---
-DROP PROCEDURE IF EXISTS process_booking_payment (UUID, UUID, DECIMAL);
+-- ---------------------------
 
 DROP PROCEDURE IF EXISTS process_booking_payment (UUID, UUID, DECIMAL, DATE, INTEGER);
 
@@ -53,8 +52,8 @@ BEGIN
         UPDATE guests
         SET wallet_balance = wallet_balance - p_total_cost
         WHERE id = p_guest_id;
-
         -- Fires trg_guest_wallet_audit
+
         INSERT INTO bookings (
             guest_id,
             property_id,

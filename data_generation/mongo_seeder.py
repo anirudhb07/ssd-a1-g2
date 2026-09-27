@@ -47,14 +47,37 @@ KM_PER_DEGREE_LATITUDE = 111.32
 # --- Vocabularies ----------------------------------------------------------
 
 LOCATION_TAGS: list[str] = [
-    "beachfront", "city-centre", "quiet-street", "near-transit",
-    "mountain-view", "walkable", "secluded", "near-nightlife",
-    "family-friendly", "limited-parking", "steep-approach", "waterfront",
-    "historic-district", "near-airport",
+    "beachfront",
+    "city-centre",
+    "quiet-street",
+    "near-transit",
+    "mountain-view",
+    "walkable",
+    "secluded",
+    "near-nightlife",
+    "family-friendly",
+    "limited-parking",
+    "steep-approach",
+    "waterfront",
+    "historic-district",
+    "near-airport",
 ]
 
 LOCATION_TAG_WEIGHTS: list[int] = [
-    18, 15, 13, 12, 10, 9, 7, 6, 5, 4, 3, 3, 2, 2,
+    18,
+    15,
+    13,
+    12,
+    10,
+    9,
+    7,
+    6,
+    5,
+    4,
+    3,
+    3,
+    2,
+    2,
 ]
 
 AMENITY_CATALOGUE: dict[str, list[str]] = {
@@ -66,14 +89,22 @@ AMENITY_CATALOGUE: dict[str, list[str]] = {
 }
 
 HOUSE_RULES: list[str] = [
-    "No smoking", "No parties or events", "Quiet hours after 10 PM",
-    "No pets", "Self check-in after 3 PM", "Check-out by 11 AM",
+    "No smoking",
+    "No parties or events",
+    "Quiet hours after 10 PM",
+    "No pets",
+    "Self check-in after 3 PM",
+    "Check-out by 11 AM",
     "Remove shoes indoors",
 ]
 
 ACCESSIBILITY_FEATURES: list[str] = [
-    "Step-free path to entrance", "Wide doorway", "Grab rails in bathroom",
-    "Ground-floor bedroom", "Lift access", "Accessible parking space",
+    "Step-free path to entrance",
+    "Wide doorway",
+    "Grab rails in bathroom",
+    "Ground-floor bedroom",
+    "Lift access",
+    "Accessible parking space",
 ]
 
 RATING_CHOICES: list[int] = [1, 2, 3, 4, 5]

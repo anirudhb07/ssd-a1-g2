@@ -1,6 +1,6 @@
---
+-- ---------------------------
 -- Step 1. Schema & Constraints
---
+-- ---------------------------
 DROP TABLE IF EXISTS bookings CASCADE;
 
 DROP TABLE IF EXISTS wallet_audit_logs CASCADE;
